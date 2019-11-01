@@ -105,7 +105,7 @@ func main() {
 		go CreateKafkaHandler(topics, group, ctx, wg, config, consumer)
 	}
 	sigterm := make(chan os.Signal, 1)
-	signal.Notify(sigterm, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGUSR1, syscall.SIGUSR2)
+	signal.Notify(sigterm, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT,syscall.SIGKILL)
 	select {
 	case <-sigterm:
 		log.Println("terminating: via signal")

@@ -109,7 +109,7 @@
             go worker(ctx, &wg)
         }
         sigterm := make(chan os.Signal, 1)
-        signal.Notify(sigterm, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+        signal.Notify(sigterm, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT,syscall.SIGKILL)
         select {
         case <-sigterm:
             log.Println("terminating: via signal")
@@ -123,3 +123,8 @@
 3. kafka的优雅退出
 
     - kafka的退出，我们也可以用上述的方法来实现安全退出，具体实现方式请查看[`consumer/consumer.go`](https://github.com/JiBadBoy/ka-safe-exit/blob/master/consumer/consumer.go)
+     
+     
+4. signal信号类型
+
+    - 信号类型请参考[点击](https://www.jianshu.com/p/ae72ad58ecb6)
