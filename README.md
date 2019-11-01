@@ -16,6 +16,7 @@
                fmt.Println("hello") //正常工作
            case <- stopChan:
                fmt.Println("exit worker") // 退出
+               return
            }   
        }   
     }
@@ -47,6 +48,7 @@
                fmt.Println("hello") //正常工作
            case <- stopChan:
                fmt.Println("exit worker") // 退出
+               return
            }   
        }   
      }
@@ -70,34 +72,45 @@
     我们可以用context包来重新实现前面的线程安全退出或超时控制
     ```go
     package main
-    import ( 
-    "context"  
-    "fmt"
-    "sync"
-    "time"
+    
+    import (
+        "context"
+        "fmt"
+        "log"
+        "os"
+        "os/signal"
+        "sync"
+        "syscall"
     )
-    func worker(ctx context.Context, wg sync.WaitGroup) {
-       defer wg.Done()
-       for{
-           select{
-           default:
-               fmt.Println("hello") //正常工作
-           case <- ctx.Done():
-               fmt.Println("exit worker") // 退出
-           }   
-       }   
-     }
-       
+    
+    func worker(ctx context.Context, wg *sync.WaitGroup) {
+        defer wg.Done()
+        for {
+            select {
+            default:
+                fmt.Println("hello") //正常工作
+            case <-ctx.Done():
+                fmt.Println("exit worker") // 退出
+                return
+            }
+        }
+    }
+    
     func main() {
-       ctx, cancel := context.WithCancel(context.Background())
-       var wg sync.WaitGroup
-       for i:=0; i < 10; i++ {
-           wg.Add(1)
-           go worker(ctx, wg)
-       }
-       time.Sleep(time.Second)
-       cancel()
-       wg.Wait()
+        ctx, cancel := context.WithCancel(context.Background())
+        var wg sync.WaitGroup
+        for i := 0; i < 10; i++ {
+            wg.Add(1)
+            go worker(ctx, &wg)
+        }
+        sigterm := make(chan os.Signal, 1)
+        signal.Notify(sigterm, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+        select {
+        case <-sigterm:
+            log.Println("terminating: via signal")
+            cancel()
+        }
+        wg.Wait()
     }
     ```
    - 当`main`主动停止工作者Goroutine时，每个工作者都可以安全退出
