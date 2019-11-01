@@ -81,6 +81,7 @@
         "os/signal"
         "sync"
         "syscall"
+        "time"
     )
     
     func worker(ctx context.Context, wg *sync.WaitGroup) {
@@ -88,10 +89,14 @@
         for {
             select {
             default:
-                fmt.Println("hello") //正常工作
+               fmt.Println("hello") //正常工作
             case <-ctx.Done():
-                fmt.Println("exit worker") // 退出
-                return
+               fmt.Println("exit worker") // 退出
+               for i := 0; i < 5; i++ {
+                    time.Sleep(200 * time.Millisecond)
+                    fmt.Println("退出清理工作", i)
+               }
+               return
             }
         }
     }
