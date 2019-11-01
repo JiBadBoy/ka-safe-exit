@@ -1,4 +1,4 @@
-##并发安全退出
+## 并发安全退出
 1. 如何通知多个Goroutine？
 
     - 我们可以通知`close`关闭一个管道来实现广播的效果，
@@ -104,4 +104,4 @@
    
 3. kafka的优雅退出
 
-    - kafka的退出，我们也可以用上述的方法来实现安全退出，具体实现方式请查看`consumer/consumer.go`
+    - kafka的退出，我们也可以用上述的方法来实现安全退出，具体实现方式请查看[`consumer/consumer.go`](https://github.com/JiBadBoy/ka-safe-exit/blob/master/consumer/consumer.go)
